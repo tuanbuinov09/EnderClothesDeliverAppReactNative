@@ -11,6 +11,8 @@ import React from 'react';
 // import type { Node, useState, navigate, useEffect } from 'react';
 import type {Node, useState, navigate, useEffect} from 'react';
 import axios from 'react-native-axios';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   SafeAreaView,
   ScrollView,
@@ -24,6 +26,8 @@ import {
   Button,
   TouchableOpacity,
   ActivityIndicator,
+  FlatList,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -33,6 +37,9 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import Login from './Login';
+import FlatListBasics from './src/FlatListView/FlatListBasics';
+import Toast from 'react-native-toast-message';
 // import Login from './src/Login/Login';
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
@@ -63,197 +70,75 @@ const Section = ({ children, title }): Node => {
     </View>
   );
 };
+const Stack = createNativeStackNavigator();
 
-const App: () => Node = () => {
-  const storeData = async value => {
-    try {
-      const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem('employee', jsonValue);
-      console.log('done saving');
-    } catch (e) {
-      // saving error
-      console.log('saving errpr');
-    }
-  };
-
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('employee');
-      console.log(jsonValue);
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
-    } catch (e) {
-      // error reading value
-      console.log('getting errpr');
-    }
-  };
-
-  const removeData = async () => {
-    try {
-      await AsyncStorage.removeItem('employee');
-      console.log('=============== done removing');
-    } catch (e) {
-      // error reading value
-      console.log('removing errpr');
-    }
-  };
-
-  const isDarkMode = useColorScheme() === 'dark';
-
-  React.useEffect(() => {
-    let emp = getData();
-    emp.then(res => {
-      console.log(res, '111111111111');
-    });
-  }, []);
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-  // eslint-disable-next-line prettier/prettier
-  const [data, setData] = React.useState({ EMAIL: '', MAT_KHAU: '' });
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
-  const handleSubmit = () => {
-    // console.log(data.EMAIL + '; ' + data.MAT_KHAU);
-  };
-
-  const login = async () => {
-    let url = '';
-
-    removeData();
-    url = 'http://localhost:22081/api/NhanVien/login';
-    console.log(url, {
-      MAT_KHAU: data.MAT_KHAU,
-      EMAIL: data.EMAIL,
-    });
-    setErrorMessage('');
-    setIsLoading(true);
-    axios
-      .post(url, {
-        MAT_KHAU: data.MAT_KHAU,
-        EMAIL: data.EMAIL,
-      })
-      .then(res => {
-        const userInfoFromRes = res.data;
-        // console.log(userInfoFromRes);
-
-        // if (userInfoFromRes !== null) {
-        setErrorMessage('');
-        storeData(userInfoFromRes);
-        const a = getData();
-        setErrorMessage(a.MA_QUYEN);
-        if (a.MA_QUYEN === 'Q04') {
-          // navigate('/admin/cart-management', {replace: true});
-        } else {
-          // navigate('/admin/dashboard', {replace: true});
-        }
-        // } else {
-        // setErrorMessage('*Xem lại tài khoản và mật khẩu');
-        // }
-        setIsLoading(false);
-      });
-  };
+function App() {
   return (
-    <View>
-      <View>
-        {/* eslint-disable-next-line prettier/prettier*/}
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <View
-            style={{
-              alignItems: 'center',
-              backgroundColor: '#333',
-              width: '100%',
-              position: 'relative',
-            }}>
-            {/* eslint-disable-next-line prettier/prettier*/}
-            <Text style={{ width: 144, height: 120, position: 'absolute' }, styles.logo}>CLO<Text style={{ color: '#009eb6' }}>T</Text>HES</Text>
-            <Image
-              source={require('./assets/logo-example.png')}
-              // eslint-disable-next-line prettier/prettier
-              style={{ width: 120, height: 120, marginTop: 0, marginBottom: 16, marginRight: -194 }}
-            />
-          </View>
-          <View style={styles.hairline} />
-          <Text style={styles.loginTitle}>Đăng nhập </Text>
-          {isLoading ? <ActivityIndicator size="large" /> : <></>}
-
-          {/* eslint-disable-next-line prettier/prettier*/}
-          <View style={{ justifyContent: 'flex-start', width: '100%', paddingHorizontal: 36 }}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email</Text>
-              <TextInput
-                style={styles.inputText}
-                textContentType="emailAddress"
-                defaultValue={data.EMAIL}
-                onChangeText={e => {
-                  // console.log(e.target);
-                  // eslint-disable-next-line prettier/prettier
-                  setData({ ...data, EMAIL: e });
-                }}
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Mật khẩu</Text>
-              <TextInput
-                style={styles.inputText}
-                textContentType="password"
-                secureTextEntry={true}
-                returnKeyType="go"
-                autoCorrect={false}
-                defaultValue={data.MAT_KHAU}
-                onChangeText={e => {
-                  // eslint-disable-next-line prettier/prettier
-                  setData({ ...data, MAT_KHAU: e });
-                }}
-              />
-            </View>
-            <Text style={styles.errorMessage}>{errorMessage}</Text>
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={e => {
-                handleSubmit();
-                login();
-              }}
-              underlayColor="#fff">
-              <Text style={styles.loginText}>ĐĂNG NHẬP</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-      {/* <SafeAreaView style={backgroundStyle}>
-        <StatusBar
-          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-          backgroundColor={backgroundStyle.backgroundColor}
-        />
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={backgroundStyle}>
-          <Header />
-          <View
-            style={{
-              backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            }}>
-            <Section title="Step One">
-              Edit <Text style={styles.highlight}>App.js</Text> to change this
-              screen and then come back to see your edits.
-            </Section>
-            <Section title="See Your Changes">
-              <ReloadInstructions />
-            </Section>
-            <Section title="Debug">
-              <DebugInstructions />
-            </Section>
-            <Section title="Learn More">
-              Read the docs to discover what to do next:
-            </Section>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView> */}
-    </View>
+    <>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{title: 'Đăng nhập'}}
+          />
+          <Stack.Screen
+            name="CartManagement"
+            component={FlatListBasics2}
+            options={{title: 'Đơn bạn giao'}}
+          />
+          <Stack.Screen
+            name="CartDetail"
+            component={CartDetail}
+            options={{title: 'Chi tiết giỏ hàng'}}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+      <Toast />
+    </>
   );
-};
+}
 
 const styles = StyleSheet.create({
+  btnCheckContainer: {
+    marginBottom: 12,
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+  },
+  buttonLabel: {
+    color: '#fff',
+    fontSize: 13,
+    marginHorizontal: 12,
+    marginVertical: 8,
+  },
+  checkButton: {
+    backgroundColor: '#333',
+    marginTop: 2,
+    borderWidth: 1,
+    borderColor: '#333',
+    marginRight: 12,
+  },
+  cancelButton: {
+    backgroundColor: 'red',
+    borderColor: '#333',
+  },
+  finishButton: {
+    backgroundColor: 'green',
+    borderColor: '#333',
+  },
+  title: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    textTransform: 'uppercase',
+    marginVertical: 10,
+    textDecorationLine: 'underline',
+  },
+  modalWrapper: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 10,
+    height: '100%',
+  },
   errorMessage: {
     color: 'red',
     height: 16,
@@ -293,11 +178,7 @@ const styles = StyleSheet.create({
   inputGroup: {
     marginTop: 20,
   },
-  inputLabel: {
-    fontSize: 16,
-    color: '#555',
-    fontWeight: 'bold',
-  },
+
   inputText: {
     width: '100%',
     appearance: 'none',
@@ -339,6 +220,691 @@ const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
+  container: {
+    flex: 1,
+    paddingTop: 22,
+  },
+  item: {
+    padding: 4,
+    fontSize: 14,
+  },
+  itemContainer: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+  },
 });
+
+const CartDetail = ({route, navigation}) => {
+  // const params = useParams(); prams.cartId
+  console.log('cartdetail render:', route.params);
+  // const notify = (message) => toast.error(message, { autoClose: true, closeDuration: 3000 });//error/info/add
+  const [cart, setCart] = React.useState({});
+  const [flag, setFlag] = React.useState(false);
+  const [employees, setEmployees] = React.useState([]);
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('employee');
+      console.log(jsonValue);
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+      console.log('getting errpr');
+    }
+  };
+  React.useEffect(() => {
+    console.log(
+      `http://localhost:22081/api/GioHang?cartId=${route.params.cartId}`,
+    );
+
+    if (route.params.cartId) {
+      try {
+        axios
+          .get('http://localhost:22081/api/NhanVien/delivering')
+          .then(res => {
+            const response = res.data;
+            console.log('emp:', response);
+            response.forEach(emp => {
+              emp.HO_TEN_STR =
+                emp.HO_TEN + ', Đang giao: ' + emp.SO_GH_NV_DANG_GIAO;
+            });
+            setEmployees(response);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+
+      try {
+        axios
+          .get(
+            `http://localhost:22081/api/GioHang?cartId=${route.params.cartId}`,
+          )
+          .then(res => {
+            const response = res.data;
+            response.chiTietGioHang2.forEach((resp, index) => {
+              try {
+                resp.STT = index + 1;
+                resp.GIA_STR = intToVNDCurrencyFormat(resp.GIA) + ' ₫';
+                resp.TRI_GIA_STR = intToVNDCurrencyFormat(
+                  resp.GIA * resp.SO_LUONG,
+                  true,
+                ); //thêm true + đ
+              } catch (e) {
+                console.log(e);
+              }
+            });
+            setCart(response);
+            //set nhân viên đã được assign
+            setFlag(true);
+            // dropdownList.current.value = response.MA_NV_GIAO;
+            // console.log('nvgiao old:', response.MA_NV_GIAO);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      console.log('cartId not fresent in props');
+    }
+  }, [route]);
+
+  const finish = async () => {
+    const a = await getData();
+    try {
+      axios
+        .put(
+          'http://localhost:22081/api/NhanVien/finish-cart',
+          {
+            ID_GH: cart.ID_GH,
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + a.accessToken,
+            },
+          },
+        )
+        .then(res => {
+          const response = res.data;
+          console.log('res: ' + res);
+          setCart({...cart, TRANG_THAI: 2, TRANG_THAI_STR: 'Đã hoàn tất'});
+          showSuccessToast('Giao đơn hàng thành công');
+        })
+        .catch(error => {
+          console.log('zzzzzzzzz', error);
+          showErrorToast('Phiên đăng nhập đã hết hạn');
+          navigation.navigate('Login');
+        });
+    } catch (error) {
+      console.log('zzzzzzzzz', error);
+    }
+  };
+
+  const cancel = async () => {
+    // if (
+    //   cart.TRANG_THAI === -1 ||
+    //   cart.TRANG_THAI === 1 ||
+    //   cart.TRANG_THAI === 2
+    // ) {
+    //   showErrorToast('Đơn hàng đã được duyệt, không thể hủy.');
+    //   return;
+    // }
+    try {
+      const a = await getData();
+      axios
+        .put(
+          'http://localhost:22081/api/KhachHang/cancel-cart',
+          {
+            ID_GH: cart.ID_GH,
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + a.accessToken,
+            },
+          },
+        )
+        .then(res => {
+          const response = res.data;
+          // console.log('res: ' + response);
+          setCart({...cart, TRANG_THAI: -1, TRANG_THAI_STR: 'Đã hủy'});
+          console.log('Hủy đơn hàng thành công');
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return flag ? (
+    <View style={styles.modalWrapper}>
+      <Text style={styles.loginTitle}>Chi tiết GH {route.params.cartId}</Text>
+      <View style={styles.btnCheckContainer}>
+        {cart.TRANG_THAI === 1 ? (
+          <TouchableOpacity
+            style={
+              ({marginRight: 100}, styles.checkButton, styles.finishButton)
+            }
+            onPress={() => {
+              Alert.alert(
+                'Hoàn tất đơn hàng',
+                'Xác nhận giao thành công',
+                [
+                  {
+                    text: 'Đồng ý',
+                    onPress: () => finish(),
+                    style: 'default',
+                  },
+                  {
+                    text: 'Hủy',
+                    // onPress: () => Alert.alert('ấn hủy'),
+                    style: 'cancel',
+                  },
+                ],
+                {
+                  cancelable: true,
+                  onDismiss: () =>
+                    console.log(
+                      'This alert was dismissed by tapping outside of the alert dialog.',
+                    ),
+                },
+              );
+              // finish();
+            }}>
+            <Text style={styles.buttonLabel}>Hoàn tất</Text>
+          </TouchableOpacity>
+        ) : (
+          <></>
+        )}
+        <Text>{'   '}</Text>
+        {cart.TRANG_THAI === 1 ? (
+          <TouchableOpacity
+            style={(styles.checkButton, styles.cancelButton)}
+            onPress={() => {
+              Alert.alert(
+                'Hủy đơn hàng',
+                'Xác nhận hủy đơn hàng',
+                [
+                  {
+                    text: 'Đồng ý',
+                    onPress: () => cancel(),
+                    style: 'default',
+                  },
+                  {
+                    text: 'Hủy',
+                    // onPress: () => Alert.alert('ấn hủy'),
+                    style: 'cancel',
+                  },
+                ],
+                {
+                  cancelable: true,
+                  onDismiss: () =>
+                    console.log(
+                      'This alert was dismissed by tapping outside of the alert dialog.',
+                    ),
+                },
+              );
+            }}>
+            <Text style={styles.buttonLabel}>Hủy đơn hàng</Text>
+          </TouchableOpacity>
+        ) : (
+          <></>
+        )}
+      </View>
+
+      <View style={styles.cartInfo}>
+        <View style={styles.infoGroup}>
+          <Text>
+            Tên người nhận: <Text style={styles.inputText}>{cart.HO_TEN}</Text>
+          </Text>
+        </View>
+        <View style={styles.infoGroup}>
+          <Text>
+            SĐT người nhận: <Text style={styles.inputText}>{cart.SDT}</Text>
+          </Text>
+        </View>
+        <View style={styles.infoGroup}>
+          <Text>
+            Email: <Text style={styles.inputText}>{cart.EMAIL}</Text>
+          </Text>
+        </View>
+        <View style={styles.infoGroup}>
+          <Text>
+            Địa chỉ: <Text style={styles.inputText}>{cart.DIA_CHI}</Text>
+          </Text>
+        </View>
+        <View style={styles.infoGroup}>
+          <Text>
+            Trạng thái đơn hàng:{' '}
+            <Text style={styles.inputText}>
+              {cart.TRANG_THAI === -1
+                ? 'Đã hủy'
+                : cart.TRANG_THAI === 0
+                ? 'Chờ duyệt'
+                : cart.TRANG_THAI === 1
+                ? 'Đang giao'
+                : cart.TRANG_THAI === 2
+                ? 'Đã hoàn tất'
+                : ''}
+            </Text>
+          </Text>
+        </View>
+        {cart.TRANG_THAI === 1 || cart.TRANG_THAI === 2 ? (
+          <>
+            <View
+              style={
+                (styles.infoGroup,
+                styles.infoEmployee,
+                styles.infoEmployeeDelivery1)
+              }>
+              <View style={(styles.infoGroup, styles.infoEmployee)}>
+                <Text>
+                  Nhân viên giao:{' '}
+                  <Text style={styles.inputText}>{cart.TEN_NV_GIAO}</Text>
+                </Text>
+              </View>
+              <View style={(styles.infoGroup, styles.infoEmployee)}>
+                <Text>
+                  SĐT nhân viên giao:{' '}
+                  <Text style={styles.inputText}>{cart.SDT_NV_GIAO}</Text>
+                </Text>
+              </View>
+            </View>
+          </>
+        ) : (
+          <View style={styles.w100}>
+            <View style={(styles.infoGroup, styles.infoEmployee)}>
+              <Text>
+                Nhân viên duyệt:{' '}
+                <Text style={styles.inputText}>{cart.TEN_NV_DUYET}</Text>
+              </Text>
+            </View>
+            <View
+              style={
+                (styles.infoGroup,
+                styles.infoEmployee,
+                styles.infoEmployeeDelivery,
+                {
+                  [styles.disabled]: getData().MA_QUYEN === 'Q04',
+                })
+              }>
+              <Text>
+                Nhân viên giao:{' '}
+                <Text id="filtering" style={styles.inputText}>
+                  {cart.TEN_NV_GIAO}
+                </Text>
+              </Text>
+            </View>
+          </View>
+        )}
+      </View>
+
+      {/* detail */}
+      <Text style={styles.title}>Sản phẩm trong giỏ</Text>
+      <View style={styles.cartDetail}>
+        <FlatList
+          data={cart.chiTietGioHang2}
+          renderItem={({item}) => (
+            <>
+              <View style={styles.itemContainer}>
+                <Text style={styles.item}>
+                  STT: <Text style={styles.inputText}>{item.STT}</Text> {'   '}
+                  Tên sản phẩm:{' '}
+                  <Text style={styles.inputText}>{item.TEN_SP}</Text>
+                </Text>
+                <Text style={styles.item}>
+                  Màu/ Size: {item.TEN_MAU}/ {item.TEN_SIZE},{'   '} Đơn giá:{' '}
+                  {item.GIA_STR}
+                </Text>
+                <Text style={styles.item}>
+                  Số lượng: {item.SO_LUONG} --> Tổng:{' '}
+                  <Text style={styles.inputText}>{item.TRI_GIA_STR}</Text>
+                </Text>
+              </View>
+            </>
+          )}
+        />
+        <View style={styles.total}>
+          <Text>
+            Tổng trị giá:{' '}
+            <Text style={styles.inputText}>
+              {intToVNDCurrencyFormat(cart.TONG_TRI_GIA) + ' ₫'}
+            </Text>
+          </Text>
+        </View>
+      </View>
+    </View>
+  ) : (
+    <></>
+  );
+};
+const FlatListBasics2 = ({navigation}) => {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [carts, setCarts] = React.useState([]);
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('employee');
+      console.log(jsonValue);
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+      console.log('getting errpr');
+    }
+  };
+  const getCartsEmpDelivering = async () => {
+    try {
+      const a = await getData();
+      console.log(103, a);
+      const empId = a.MA_NV;
+      console.log(105, empId);
+      setIsLoading(true);
+      let url = `http://localhost:22081/api/NhanVien/delivering-by-emp?deliverEmpId=${empId}`;
+      console.log(url);
+      axios.get(url).then(res => {
+        const cartsFromApi = res.data;
+        // console.log(cartsFromApi);
+        cartsFromApi.forEach(cart => {
+          if (cart.NGAY_TAO) {
+            let date = new Date(cart.NGAY_TAO);
+            cart.NGAY_TAO = date.toLocaleDateString('vi-VN');
+            console.log(
+              new Intl.DateTimeFormat('vi-VN', {dateStyle: 'short'}).format(
+                date,
+              ),
+            );
+            cart.NGAY_TAO = new Intl.DateTimeFormat('vi-VN', {
+              dateStyle: 'short',
+            }).format(date);
+          }
+          if (cart.NGAY_GIAO) {
+            let date = new Date(cart.NGAY_GIAO);
+            cart.NGAY_GIAO = date.toLocaleDateString('vi-VN');
+            console.log(
+              new Intl.DateTimeFormat('vi-VN', {dateStyle: 'short'}).format(
+                date,
+              ),
+            );
+            cart.NGAY_GIAO = new Intl.DateTimeFormat('vi-VN', {
+              dateStyle: 'short',
+            }).format(date);
+          }
+          if (cart.TRANG_THAI === 0) {
+            cart.TRANG_THAI_STR = 'Chờ duyệt';
+          }
+          if (cart.TRANG_THAI === 1) {
+            cart.TRANG_THAI_STR = 'Đang giao hàng';
+          }
+          if (cart.TRANG_THAI === 2) {
+            cart.TRANG_THAI_STR = 'Đã hoàn tất';
+          }
+          if (cart.TRANG_THAI === -1) {
+            cart.TRANG_THAI_STR = 'Đã hủy';
+          }
+        });
+        // console.log(cartsFromApi);
+        setCarts(cartsFromApi);
+        console.log(cartsFromApi);
+        setIsLoading(false);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  React.useEffect(() => {
+    const getCartsEmpDelivering = async () => {
+      try {
+        const a = await getData();
+        console.log(103, a);
+        const empId = a.MA_NV;
+        console.log(105, empId);
+        setIsLoading(true);
+        let url = `http://localhost:22081/api/NhanVien/delivering-by-emp?deliverEmpId=${empId}`;
+        console.log(url);
+        axios.get(url).then(res => {
+          const cartsFromApi = res.data;
+          // console.log(cartsFromApi);
+          cartsFromApi.forEach(cart => {
+            if (cart.NGAY_TAO) {
+              let date = new Date(cart.NGAY_TAO);
+              cart.NGAY_TAO = date.toLocaleDateString('vi-VN');
+              console.log(
+                new Intl.DateTimeFormat('vi-VN', {dateStyle: 'short'}).format(
+                  date,
+                ),
+              );
+              cart.NGAY_TAO = new Intl.DateTimeFormat('vi-VN', {
+                dateStyle: 'short',
+              }).format(date);
+            }
+            if (cart.NGAY_GIAO) {
+              let date = new Date(cart.NGAY_GIAO);
+              cart.NGAY_GIAO = date.toLocaleDateString('vi-VN');
+              console.log(
+                new Intl.DateTimeFormat('vi-VN', {dateStyle: 'short'}).format(
+                  date,
+                ),
+              );
+              cart.NGAY_GIAO = new Intl.DateTimeFormat('vi-VN', {
+                dateStyle: 'short',
+              }).format(date);
+            }
+            if (cart.TRANG_THAI === 0) {
+              cart.TRANG_THAI_STR = 'Chờ duyệt';
+            }
+            if (cart.TRANG_THAI === 1) {
+              cart.TRANG_THAI_STR = 'Đang giao hàng';
+            }
+            if (cart.TRANG_THAI === 2) {
+              cart.TRANG_THAI_STR = 'Đã hoàn tất';
+            }
+            if (cart.TRANG_THAI === -1) {
+              cart.TRANG_THAI_STR = 'Đã hủy';
+            }
+          });
+          // console.log(cartsFromApi);
+          setCarts(cartsFromApi);
+          console.log(cartsFromApi);
+          setIsLoading(false);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getCartsEmpDelivering();
+  }, []);
+  return (
+    <View style={styles.container}>
+      {isLoading ? <ActivityIndicator /> : <></>}
+      <View style={styles.btnCheckContainer}>
+        <TouchableOpacity
+          style={
+            (styles.checkButton,
+            {backgroundColor: '#009eb6', marginLeft: 8, marginTop: -8})
+          }
+          onPress={async e => {
+            try {
+              const a = await getData();
+              const empId = a.MA_NV;
+              setIsLoading(true);
+              let url = `http://localhost:22081/api/NhanVien/delivering-by-emp?deliverEmpId=${empId}`;
+              console.log(url);
+              axios.get(url).then(res => {
+                const cartsFromApi = res.data;
+                // console.log(cartsFromApi);
+                cartsFromApi.forEach(cart => {
+                  if (cart.NGAY_TAO) {
+                    let date = new Date(cart.NGAY_TAO);
+                    cart.NGAY_TAO = date.toLocaleDateString('vi-VN');
+                    console.log(
+                      new Intl.DateTimeFormat('vi-VN', {
+                        dateStyle: 'short',
+                      }).format(date),
+                    );
+                    cart.NGAY_TAO = new Intl.DateTimeFormat('vi-VN', {
+                      dateStyle: 'short',
+                    }).format(date);
+                  }
+                  if (cart.NGAY_GIAO) {
+                    let date = new Date(cart.NGAY_GIAO);
+                    cart.NGAY_GIAO = date.toLocaleDateString('vi-VN');
+                    console.log(
+                      new Intl.DateTimeFormat('vi-VN', {
+                        dateStyle: 'short',
+                      }).format(date),
+                    );
+                    cart.NGAY_GIAO = new Intl.DateTimeFormat('vi-VN', {
+                      dateStyle: 'short',
+                    }).format(date);
+                  }
+                  if (cart.TRANG_THAI === 0) {
+                    cart.TRANG_THAI_STR = 'Chờ duyệt';
+                  }
+                  if (cart.TRANG_THAI === 1) {
+                    cart.TRANG_THAI_STR = 'Đang giao hàng';
+                  }
+                  if (cart.TRANG_THAI === 2) {
+                    cart.TRANG_THAI_STR = 'Đã hoàn tất';
+                  }
+                  if (cart.TRANG_THAI === -1) {
+                    cart.TRANG_THAI_STR = 'Đã hủy';
+                  }
+                });
+                // console.log(cartsFromApi);
+                setCarts(cartsFromApi);
+                console.log(cartsFromApi);
+                setIsLoading(false);
+              });
+            } catch (error) {
+              console.error(error);
+            }
+          }}>
+          <Text style={styles.buttonLabel}>Làm mới</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={
+            (styles.checkButton,
+            {
+              backgroundColor: 'transparent',
+              marginLeft: 8,
+              position: 'absolute',
+              right: 8,
+            })
+          }
+          onPress={async e => {
+            navigation.navigate('Login');
+          }}>
+          <Text style={(styles.buttonLabel, {textDecorationLine: 'underline'})}>
+            Đăng xuất
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        data={carts ? carts : []}
+        renderItem={({item}) => (
+          <TouchableOpacity
+            onPress={e => {
+              navigation.navigate('CartDetail', {
+                cartId: item.ID_GH,
+              });
+            }}>
+            <View style={styles.itemContainer}>
+              <Text style={styles.item}>
+                ID_GH: <Text style={styles.inputText}>{item.ID_GH}</Text>
+              </Text>
+              <Text style={styles.item}>
+                Người nhận: <Text style={styles.inputText}>{item.HO_TEN}</Text>
+              </Text>
+              <Text style={styles.item}>
+                SĐT: <Text style={styles.inputText}>{item.SDT}</Text>, {'   '}
+                Email: <Text style={styles.inputText}>{item.EMAIL}</Text>
+              </Text>
+              <Text style={styles.item}>
+                Địa chỉ: <Text style={styles.inputText}>{item.DIA_CHI}</Text>,
+                {'   '} Trạng thái:{' '}
+                <Text style={styles.inputText}>{item.TRANG_THAI_STR}</Text>
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+};
+const intToVNDCurrencyFormat = (number, withSymbol) => {
+  let result;
+  result =
+    number.toLocaleString('it-IT', {style: 'currency', currency: 'VND'}) + '';
+
+  if (withSymbol) {
+    result = result + ' ₫';
+  } else {
+  }
+
+  return result;
+};
+const showSuccessToast = message => {
+  Toast.show({
+    type: 'success',
+    text1: 'Thông báo',
+    text2: message,
+  });
+};
+const showErrorToast = message => {
+  Toast.show({
+    type: 'error',
+    text1: 'Thông báo',
+    text2: message,
+  });
+};
+const LogOutIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+      />
+    </svg>
+  );
+};
+const CancelIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+      />
+    </svg>
+  );
+};
+const CheckIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-2 w-2"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+  );
+};
 
 export default App;
