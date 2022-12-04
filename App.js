@@ -100,6 +100,9 @@ function App() {
 }
 
 const styles = StyleSheet.create({
+  logOutContainer: {
+    flex: 1,
+  },
   btnCheckContainer: {
     marginBottom: 12,
     display: 'flex',
@@ -578,10 +581,12 @@ const CartDetail = ({route, navigation}) => {
 const FlatListBasics2 = ({navigation}) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [carts, setCarts] = React.useState([]);
+  const [emp, setEmp] = React.useState({});
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('employee');
       console.log(jsonValue);
+      setEmp(jsonValue != null ? JSON.parse(jsonValue) : null);
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
       // error reading value
@@ -591,6 +596,7 @@ const FlatListBasics2 = ({navigation}) => {
   const getCartsEmpDelivering = async () => {
     try {
       const a = await getData();
+
       console.log(103, a);
       const empId = a.MA_NV;
       console.log(105, empId);
@@ -713,90 +719,106 @@ const FlatListBasics2 = ({navigation}) => {
     <View style={styles.container}>
       {isLoading ? <ActivityIndicator /> : <></>}
       <View style={styles.btnCheckContainer}>
-        <TouchableOpacity
-          style={
-            (styles.checkButton,
-            {backgroundColor: '#009eb6', marginLeft: 8, marginTop: -8})
-          }
-          onPress={async e => {
-            try {
-              const a = await getData();
-              const empId = a.MA_NV;
-              setIsLoading(true);
-              let url = `http://localhost:22081/api/NhanVien/delivering-by-emp?deliverEmpId=${empId}`;
-              console.log(url);
-              axios.get(url).then(res => {
-                const cartsFromApi = res.data;
-                // console.log(cartsFromApi);
-                cartsFromApi.forEach(cart => {
-                  if (cart.NGAY_TAO) {
-                    let date = new Date(cart.NGAY_TAO);
-                    cart.NGAY_TAO = date.toLocaleDateString('vi-VN');
-                    console.log(
-                      new Intl.DateTimeFormat('vi-VN', {
-                        dateStyle: 'short',
-                      }).format(date),
-                    );
-                    cart.NGAY_TAO = new Intl.DateTimeFormat('vi-VN', {
-                      dateStyle: 'short',
-                    }).format(date);
-                  }
-                  if (cart.NGAY_GIAO) {
-                    let date = new Date(cart.NGAY_GIAO);
-                    cart.NGAY_GIAO = date.toLocaleDateString('vi-VN');
-                    console.log(
-                      new Intl.DateTimeFormat('vi-VN', {
-                        dateStyle: 'short',
-                      }).format(date),
-                    );
-                    cart.NGAY_GIAO = new Intl.DateTimeFormat('vi-VN', {
-                      dateStyle: 'short',
-                    }).format(date);
-                  }
-                  if (cart.TRANG_THAI === 0) {
-                    cart.TRANG_THAI_STR = 'Chờ duyệt';
-                  }
-                  if (cart.TRANG_THAI === 1) {
-                    cart.TRANG_THAI_STR = 'Đang giao hàng';
-                  }
-                  if (cart.TRANG_THAI === 2) {
-                    cart.TRANG_THAI_STR = 'Đã hoàn tất';
-                  }
-                  if (cart.TRANG_THAI === -1) {
-                    cart.TRANG_THAI_STR = 'Đã hủy';
-                  }
-                });
-                // console.log(cartsFromApi);
-                setCarts(cartsFromApi);
-                console.log(cartsFromApi);
-                setIsLoading(false);
-              });
-            } catch (error) {
-              console.error(error);
-            }
+        <View
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItem: 'center',
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            paddingRight: 10,
           }}>
-          <Text style={styles.buttonLabel}>Làm mới</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={
-            (styles.checkButton,
-            {
-              backgroundColor: 'transparent',
-              marginLeft: 8,
-              position: 'absolute',
-              right: 8,
-            })
-          }
-          onPress={async e => {
-            navigation.navigate('Login');
-          }}>
-          <Text style={(styles.buttonLabel, {textDecorationLine: 'underline'})}>
-            Đăng xuất
+          <Text style={(styles.buttonLabel, {color: '#333'})}>
+            Chào, <Text style={styles.inputText}>{emp.HO_TEN}</Text> |{' '}
           </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={
+              (styles.checkButton,
+              {
+                backgroundColor: 'transparent',
+                marginLeft: 8,
+                marginTop: 1,
+              })
+            }
+            onPress={async e => {
+              navigation.navigate('Login');
+            }}>
+            <Text
+              style={(styles.buttonLabel, {textDecorationLine: 'underline'})}>
+              Đăng xuất
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
+      <TouchableOpacity
+        style={
+          (styles.checkButton,
+          {
+            backgroundColor: '#009eb6',
+            marginLeft: 8,
+            marginBottom: 8,
+            width: 80,
+          })
+        }
+        onPress={async e => {
+          try {
+            const a = await getData();
+            const empId = a.MA_NV;
+            setIsLoading(true);
+            let url = `http://localhost:22081/api/NhanVien/delivering-by-emp?deliverEmpId=${empId}`;
+            console.log(url);
+            axios.get(url).then(res => {
+              const cartsFromApi = res.data;
+              // console.log(cartsFromApi);
+              cartsFromApi.forEach(cart => {
+                if (cart.NGAY_TAO) {
+                  let date = new Date(cart.NGAY_TAO);
+                  cart.NGAY_TAO = date.toLocaleDateString('vi-VN');
+                  console.log(
+                    new Intl.DateTimeFormat('vi-VN', {
+                      dateStyle: 'short',
+                    }).format(date),
+                  );
+                  cart.NGAY_TAO = new Intl.DateTimeFormat('vi-VN', {
+                    dateStyle: 'short',
+                  }).format(date);
+                }
+                if (cart.NGAY_GIAO) {
+                  let date = new Date(cart.NGAY_GIAO);
+                  cart.NGAY_GIAO = date.toLocaleDateString('vi-VN');
+                  console.log(
+                    new Intl.DateTimeFormat('vi-VN', {
+                      dateStyle: 'short',
+                    }).format(date),
+                  );
+                  cart.NGAY_GIAO = new Intl.DateTimeFormat('vi-VN', {
+                    dateStyle: 'short',
+                  }).format(date);
+                }
+                if (cart.TRANG_THAI === 0) {
+                  cart.TRANG_THAI_STR = 'Chờ duyệt';
+                }
+                if (cart.TRANG_THAI === 1) {
+                  cart.TRANG_THAI_STR = 'Đang giao hàng';
+                }
+                if (cart.TRANG_THAI === 2) {
+                  cart.TRANG_THAI_STR = 'Đã hoàn tất';
+                }
+                if (cart.TRANG_THAI === -1) {
+                  cart.TRANG_THAI_STR = 'Đã hủy';
+                }
+              });
+              // console.log(cartsFromApi);
+              setCarts(cartsFromApi);
+              console.log(cartsFromApi);
+              setIsLoading(false);
+            });
+          } catch (error) {
+            console.error(error);
+          }
+        }}>
+        <Text style={styles.buttonLabel}>Làm mới</Text>
+      </TouchableOpacity>
       <FlatList
         data={carts ? carts : []}
         renderItem={({item}) => (
