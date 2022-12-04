@@ -1,0 +1,6 @@
+adb -s emulator-5554 reverse tcp:22081 tcp:22081
+
+--chạy ứng dụng xong chạy lệnh trên để gọi đc localhost api
+
+adb devices
+--xem danh sahcs devices
