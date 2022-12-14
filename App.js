@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 /**
  * Sample React Native App
@@ -9,10 +10,10 @@
 import React from 'react';
 // eslint-disable-next-line prettier/prettier
 // import type { Node, useState, navigate, useEffect } from 'react';
-import type {Node, useState, navigate, useEffect} from 'react';
+import type { Node, useState, navigate, useEffect } from 'react';
 import axios from 'react-native-axios';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   SafeAreaView,
   ScrollView,
@@ -40,6 +41,9 @@ import {
 import Login from './Login';
 import FlatListBasics from './src/FlatListView/FlatListBasics';
 import Toast from 'react-native-toast-message';
+// eslint-disable-next-line prettier/prettier
+import { Linking } from 'react-native';
+
 // import Login from './src/Login/Login';
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
@@ -80,17 +84,17 @@ function App() {
           <Stack.Screen
             name="Login"
             component={Login}
-            options={{title: 'Đăng nhập'}}
+            options={{ title: 'Đăng nhập' }}
           />
           <Stack.Screen
             name="CartManagement"
             component={FlatListBasics2}
-            options={{title: 'Đơn bạn giao'}}
+            options={{ title: 'Đơn bạn giao' }}
           />
           <Stack.Screen
             name="CartDetail"
             component={CartDetail}
-            options={{title: 'Chi tiết giỏ hàng'}}
+            options={{ title: 'Chi tiết giỏ hàng' }}
           />
         </Stack.Navigator>
       </NavigationContainer>
@@ -239,7 +243,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const CartDetail = ({route, navigation}) => {
+const CartDetail = ({ route, navigation }) => {
   // const params = useParams(); prams.cartId
   console.log('cartdetail render:', route.params);
   // const notify = (message) => toast.error(message, { autoClose: true, closeDuration: 3000 });//error/info/add
@@ -329,7 +333,7 @@ const CartDetail = ({route, navigation}) => {
         .then(res => {
           const response = res.data;
           console.log('res: ' + res);
-          setCart({...cart, TRANG_THAI: 2, TRANG_THAI_STR: 'Đã hoàn tất'});
+          setCart({ ...cart, TRANG_THAI: 2, TRANG_THAI_STR: 'Đã hoàn tất' });
           showSuccessToast('Giao đơn hàng thành công');
         })
         .catch(error => {
@@ -368,7 +372,7 @@ const CartDetail = ({route, navigation}) => {
         .then(res => {
           const response = res.data;
           // console.log('res: ' + response);
-          setCart({...cart, TRANG_THAI: -1, TRANG_THAI_STR: 'Đã hủy'});
+          setCart({ ...cart, TRANG_THAI: -1, TRANG_THAI_STR: 'Đã hủy' });
           console.log('Hủy đơn hàng thành công');
         });
     } catch (error) {
@@ -383,7 +387,7 @@ const CartDetail = ({route, navigation}) => {
         {cart.TRANG_THAI === 1 ? (
           <TouchableOpacity
             style={
-              ({marginRight: 100}, styles.checkButton, styles.finishButton)
+              ({ marginRight: 100 }, styles.checkButton, styles.finishButton)
             }
             onPress={() => {
               Alert.alert(
@@ -480,12 +484,12 @@ const CartDetail = ({route, navigation}) => {
               {cart.TRANG_THAI === -1
                 ? 'Đã hủy'
                 : cart.TRANG_THAI === 0
-                ? 'Chờ duyệt'
-                : cart.TRANG_THAI === 1
-                ? 'Đang giao'
-                : cart.TRANG_THAI === 2
-                ? 'Đã hoàn tất'
-                : ''}
+                  ? 'Chờ duyệt'
+                  : cart.TRANG_THAI === 1
+                    ? 'Đang giao'
+                    : cart.TRANG_THAI === 2
+                      ? 'Đã hoàn tất'
+                      : ''}
             </Text>
           </Text>
         </View>
@@ -494,8 +498,8 @@ const CartDetail = ({route, navigation}) => {
             <View
               style={
                 (styles.infoGroup,
-                styles.infoEmployee,
-                styles.infoEmployeeDelivery1)
+                  styles.infoEmployee,
+                  styles.infoEmployeeDelivery1)
               }>
               <View style={(styles.infoGroup, styles.infoEmployee)}>
                 <Text>
@@ -522,8 +526,8 @@ const CartDetail = ({route, navigation}) => {
             <View
               style={
                 (styles.infoGroup,
-                styles.infoEmployee,
-                styles.infoEmployeeDelivery,
+                  styles.infoEmployee,
+                  styles.infoEmployeeDelivery,
                 {
                   [styles.disabled]: getData().MA_QUYEN === 'Q04',
                 })
@@ -544,7 +548,7 @@ const CartDetail = ({route, navigation}) => {
       <View style={styles.cartDetail}>
         <FlatList
           data={cart.chiTietGioHang2}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <>
               <View style={styles.itemContainer}>
                 <Text style={styles.item}>
@@ -578,7 +582,7 @@ const CartDetail = ({route, navigation}) => {
     <></>
   );
 };
-const FlatListBasics2 = ({navigation}) => {
+const FlatListBasics2 = ({ navigation }) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [carts, setCarts] = React.useState([]);
   const [emp, setEmp] = React.useState({});
@@ -611,7 +615,7 @@ const FlatListBasics2 = ({navigation}) => {
             let date = new Date(cart.NGAY_TAO);
             cart.NGAY_TAO = date.toLocaleDateString('vi-VN');
             console.log(
-              new Intl.DateTimeFormat('vi-VN', {dateStyle: 'short'}).format(
+              new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short' }).format(
                 date,
               ),
             );
@@ -623,7 +627,7 @@ const FlatListBasics2 = ({navigation}) => {
             let date = new Date(cart.NGAY_GIAO);
             cart.NGAY_GIAO = date.toLocaleDateString('vi-VN');
             console.log(
-              new Intl.DateTimeFormat('vi-VN', {dateStyle: 'short'}).format(
+              new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short' }).format(
                 date,
               ),
             );
@@ -671,7 +675,7 @@ const FlatListBasics2 = ({navigation}) => {
               let date = new Date(cart.NGAY_TAO);
               cart.NGAY_TAO = date.toLocaleDateString('vi-VN');
               console.log(
-                new Intl.DateTimeFormat('vi-VN', {dateStyle: 'short'}).format(
+                new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short' }).format(
                   date,
                 ),
               );
@@ -683,7 +687,7 @@ const FlatListBasics2 = ({navigation}) => {
               let date = new Date(cart.NGAY_GIAO);
               cart.NGAY_GIAO = date.toLocaleDateString('vi-VN');
               console.log(
-                new Intl.DateTimeFormat('vi-VN', {dateStyle: 'short'}).format(
+                new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short' }).format(
                   date,
                 ),
               );
@@ -728,7 +732,7 @@ const FlatListBasics2 = ({navigation}) => {
             justifyContent: 'flex-end',
             paddingRight: 10,
           }}>
-          <Text style={(styles.buttonLabel, {color: '#333'})}>
+          <Text style={(styles.buttonLabel, { color: '#333' })}>
             Chào, <Text style={styles.inputText}>{emp.HO_TEN}</Text> |{' '}
           </Text>
           <TouchableOpacity
@@ -744,7 +748,7 @@ const FlatListBasics2 = ({navigation}) => {
               navigation.navigate('Login');
             }}>
             <Text
-              style={(styles.buttonLabel, {textDecorationLine: 'underline'})}>
+              style={(styles.buttonLabel, { textDecorationLine: 'underline' })}>
               Đăng xuất
             </Text>
           </TouchableOpacity>
@@ -821,7 +825,7 @@ const FlatListBasics2 = ({navigation}) => {
       </TouchableOpacity>
       <FlatList
         data={carts ? carts : []}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <TouchableOpacity
             onPress={e => {
               navigation.navigate('CartDetail', {
@@ -844,17 +848,38 @@ const FlatListBasics2 = ({navigation}) => {
                 {'   '} Trạng thái:{' '}
                 <Text style={styles.inputText}>{item.TRANG_THAI_STR}</Text>
               </Text>
+              <TouchableOpacity
+                onPress={e => {
+                  Linking.openURL(`tel:${item.SDT}`);
+                }}
+                style={{ display: 'flex', borderColor: '#bbb', borderWidth: 1 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                  <Image
+                    source={require('./assets/call-icon.png')}
+                    // eslint-disable-next-line prettier/prettier
+                    style={{ width: 32, height: 32, marginHorizontal: 8, marginVertical: 4 }}
+
+                  />
+                  <Text style={{ fontWeight: 'bold', textDecorationLine: 'underline', color: '#009eb6', fontSize: 15 }}>{'Gọi cho người nhận'}</Text>
+                </View>
+
+              </TouchableOpacity>
             </View>
+
+
+
+
           </TouchableOpacity>
-        )}
+        )
+        }
       />
-    </View>
+    </View >
   );
 };
 const intToVNDCurrencyFormat = (number, withSymbol) => {
   let result;
   result =
-    number.toLocaleString('it-IT', {style: 'currency', currency: 'VND'}) + '';
+    number.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }) + '';
 
   if (withSymbol) {
     result = result + ' ₫';
