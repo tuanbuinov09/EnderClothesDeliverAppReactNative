@@ -845,8 +845,12 @@ const FlatListBasics2 = ({ navigation }) => {
               </Text>
               <Text style={styles.item}>
                 Địa chỉ: <Text style={styles.inputText}>{item.DIA_CHI}</Text>,
-                {'   '} Trạng thái:{' '}
-                <Text style={styles.inputText}>{item.TRANG_THAI_STR}</Text>
+                {'   '}
+                <View>
+                  <Text>Trạng thái:{' '}  <Text style={styles.inputText}>{item.TRANG_THAI_STR}</Text></Text>
+
+
+                </View>
               </Text>
               <TouchableOpacity
                 onPress={e => {
