@@ -94,7 +94,7 @@ function App() {
           <Stack.Screen
             name="CartDetail"
             component={CartDetail}
-            options={{ title: 'Chi tiết giỏ hàng' }}
+            options={{ title: 'Chi tiết đơn hàng' }}
           />
         </Stack.Navigator>
       </NavigationContainer>
@@ -262,7 +262,7 @@ const CartDetail = ({ route, navigation }) => {
   };
   React.useEffect(() => {
     console.log(
-      `http://localhost:22081/api/GioHang?cartId=${route.params.cartId}`,
+      `http://localhost:22081/api/DonHang?cartId=${route.params.cartId}`,
     );
 
     if (route.params.cartId) {
@@ -285,7 +285,7 @@ const CartDetail = ({ route, navigation }) => {
       try {
         axios
           .get(
-            `http://localhost:22081/api/GioHang?cartId=${route.params.cartId}`,
+            `http://localhost:22081/api/DonHang?cartId=${route.params.cartId}`,
           )
           .then(res => {
             const response = res.data;
@@ -322,7 +322,7 @@ const CartDetail = ({ route, navigation }) => {
         .put(
           'http://localhost:22081/api/NhanVien/finish-cart',
           {
-            ID_GH: cart.ID_GH,
+            ID_DH: cart.ID_DH,
           },
           {
             headers: {
@@ -361,7 +361,7 @@ const CartDetail = ({ route, navigation }) => {
         .put(
           'http://localhost:22081/api/KhachHang/cancel-cart',
           {
-            ID_GH: cart.ID_GH,
+            ID_DH: cart.ID_DH,
           },
           {
             headers: {
@@ -382,7 +382,7 @@ const CartDetail = ({ route, navigation }) => {
 
   return flag ? (
     <View style={styles.modalWrapper}>
-      <Text style={styles.loginTitle}>Chi tiết GH {route.params.cartId}</Text>
+      <Text style={styles.loginTitle}>Chi tiết ĐH {route.params.cartId}</Text>
       <View style={styles.btnCheckContainer}>
         {cart.TRANG_THAI === 1 ? (
           <TouchableOpacity
@@ -544,7 +544,7 @@ const CartDetail = ({ route, navigation }) => {
       </View>
 
       {/* detail */}
-      <Text style={styles.title}>Sản phẩm trong giỏ</Text>
+      <Text style={styles.title}>Sản phẩm trong đơn hàng</Text>
       <View style={styles.cartDetail}>
         <FlatList
           data={cart.chiTietGioHang2}
@@ -829,29 +829,30 @@ const FlatListBasics2 = ({ navigation }) => {
           <TouchableOpacity
             onPress={e => {
               navigation.navigate('CartDetail', {
-                cartId: item.ID_GH,
+                cartId: item.ID_DH,
               });
             }}>
             <View style={styles.itemContainer}>
               <Text style={styles.item}>
-                ID_GH: <Text style={styles.inputText}>{item.ID_GH}</Text>
+                ID_DH: <Text style={styles.inputText}>{item.ID_DH}
+                </Text>
+                {'     '}
+                <Text>Trạng thái: <Text style={styles.inputText}>{item.TRANG_THAI_STR}</Text></Text>
+
               </Text>
               <Text style={styles.item}>
                 Người nhận: <Text style={styles.inputText}>{item.HO_TEN}</Text>
               </Text>
               <Text style={styles.item}>
-                SĐT: <Text style={styles.inputText}>{item.SDT}</Text>, {'   '}
+                SĐT: <Text style={styles.inputText}>{item.SDT}</Text>,
                 Email: <Text style={styles.inputText}>{item.EMAIL}</Text>
               </Text>
               <Text style={styles.item}>
-                Địa chỉ: <Text style={styles.inputText}>{item.DIA_CHI}</Text>,
-                {'   '}
-                <View>
-                  <Text>Trạng thái:{' '}  <Text style={styles.inputText}>{item.TRANG_THAI_STR}</Text></Text>
+                Địa chỉ: <Text style={styles.inputText}>{item.DIA_CHI}</Text>
 
 
-                </View>
               </Text>
+
               <TouchableOpacity
                 onPress={e => {
                   Linking.openURL(`tel:${item.SDT}`);
